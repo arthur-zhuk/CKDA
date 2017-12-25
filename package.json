@@ -1,5 +1,5 @@
 {
-  "name": "ckda",
+  "name": "ck-data-analyzer",
   "version": "1.0.0",
   "description": "A Vue.js project",
   "author": "Arthur Zhuk <arthurzhuk@gmail.com>",
@@ -9,12 +9,17 @@
     "start": "node server.js",
     "lint": "eslint --ext .js,.vue src",
     "build": "node build/build.js",
+    "postinstall": "npm install express",
     "heroku-postbuild": "webpack -p --config build/webpack.prod.conf.js --progress"
   },
   "dependencies": {
+    "axios": "^0.17.1",
+    "chart.js": "^2.7.1",
     "express": "^4.16.2",
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue-chartjs": "^3.0.2",
+    "vue-router": "^3.0.1",
+    "vuetify": "^0.17.5"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
@@ -42,12 +47,14 @@
     "friendly-errors-webpack-plugin": "^1.6.1",
     "html-webpack-plugin": "^2.30.1",
     "node-notifier": "^5.1.2",
+    "node-sass": "^4.7.2",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "ora": "^1.2.0",
     "portfinder": "^1.0.13",
     "postcss-import": "^11.0.0",
     "postcss-loader": "^2.0.8",
     "rimraf": "^2.6.0",
+    "sass-loader": "^6.0.6",
     "semver": "^5.3.0",
     "shelljs": "^0.7.6",
     "uglifyjs-webpack-plugin": "^1.1.1",
