@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container id="animated-number-demo">
     <!-- TODO: search -->
     <v-card-title>
       Cattributes
@@ -16,11 +16,13 @@
       :headers="headers"
       :items="cattributes"
       :search="search"
+      type="number"
+      step="20"
       hide-actions
       class="elevation-1"
     >
       <template slot="items" slot-scope="props">
-        <td class="cap" :style="{ backgroundColor: props.item.description }">{{ props.item.description }}</td>
+        <td class="cap">{{ props.item.description }}</td>
         <td class="text-xs-right cap">{{ props.item.type }}</td>
         <td 
           :class="{ 
@@ -62,13 +64,19 @@ export default {
         { title: 'Home', icon: 'dashboard' },
         { title: 'About', icon: 'question_answer' },
       ],
+      refresh: null,
     };
   },
   mounted() {
     axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
-      console.log('data', data);
       this.cattributes = data.data;
     });
+    this.refresh = setInterval(() => {
+      axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
+        this.cattributes = data.data;
+      });
+    }, 30000);
+
 
     // Overwriting base render method with actual data.
     // this.renderChart({
