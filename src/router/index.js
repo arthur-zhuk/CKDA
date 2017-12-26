@@ -4,6 +4,7 @@ import VueAnalytics from 'vue-analytics';
 import Router from 'vue-router';
 import Attributes from '@/components/Attributes';
 import DataCrunch from '@/components/DataCrunch';
+import About from '@/components/About';
 
 Vue.use(Router);
 Vue.use(Vuetify);
@@ -27,6 +28,11 @@ export default new Router({
       path: '/datacrunch',
       name: 'DataCrunch',
       component: DataCrunch,
+    },
+    {
+      path: '/about',
+      name: 'About',
+      component: About,
     },
     { path: '*', redirect: '/' },
   ],
