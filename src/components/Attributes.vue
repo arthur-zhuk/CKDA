@@ -1,9 +1,21 @@
 <template>
   <v-container>
     <!-- TODO: search -->
+    <v-card-title>
+      Cattributes
+      <v-spacer></v-spacer>
+      <v-text-field
+        append-icon="search"
+        label="Search"
+        single-line
+        hide-details
+        v-model="search"
+      ></v-text-field>
+    </v-card-title>
     <v-data-table
-      v-bind:headers="headers"
+      :headers="headers"
       :items="cattributes"
+      :search="search"
       hide-actions
       class="elevation-1"
     >
@@ -15,7 +27,7 @@
             'light-green lighten-1': props.item.total < 5000,
             'yellow darken-1': props.item.total >= 5000 && props.item.total <= 13000,
             'red darken-1': props.item.total > 13000,
-           }"
+            }"
           class="text-xs-right cap">
           {{ props.item.total }}
         </td>
@@ -31,11 +43,10 @@ import axios from 'axios';
 // import VueCharts, { Bar, Line } from 'vue-chartjs';
 
 export default {
-  name: 'CKDAStart',
-  computed: {
-  },
+  name: 'Attributes',
   data() {
     return {
+      search: '',
       headers: [
         {
           text: 'Cattributes',
@@ -76,6 +87,6 @@ export default {
 
 <style lang="scss" scoped>
 .cap {
-  text-transform: capitalize;
+text-transform: capitalize;
 }
 </style>
