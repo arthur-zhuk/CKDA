@@ -1,5 +1,7 @@
 <template>
   <v-container>
+    <h3>Attributes</h3>
+    <!-- TODO: search -->
     <v-data-table
       v-bind:headers="headers"
       :items="cattributes"

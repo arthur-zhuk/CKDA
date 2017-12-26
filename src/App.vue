@@ -1,7 +1,20 @@
 <template>
   <div id="app">
-    <v-app dark>
-      <img class="logo" src="./assets/CKDALogo.png">
+    <v-app light>
+      <v-layout row justify-center>
+        <v-flex xs12>
+          <h2 class="pb-5 text-xs-center">Crypto Kitty Data Analyzer</h2>
+        </v-flex>
+      </v-layout>
+      <v-layout row justify-center>
+        <v-avatar
+          :tile="false"
+          :size="'60px'"
+          class="grey lighten-4"
+        >
+          <img class="logo" src="./assets/CKDALogo.png">
+        </v-avatar>
+      </v-layout>
       <router-view/>
     </v-app>
   </div>
@@ -10,6 +23,10 @@
 <script>
 export default {
   name: 'app',
+  data() {
+    return {
+    };
+  },
 };
 </script>
 
@@ -18,9 +35,6 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 .logo {
   width: 200px;
