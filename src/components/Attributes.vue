@@ -1,6 +1,5 @@
 <template>
   <v-container id="animated-number-demo">
-    <!-- TODO: search -->
     <v-card-title>
       Cattributes
       <v-spacer></v-spacer>
@@ -60,10 +59,6 @@ export default {
           { text: 'Total', value: 'total' },
       ],
       cattributes: [],
-      items: [
-        { title: 'Home', icon: 'dashboard' },
-        { title: 'About', icon: 'question_answer' },
-      ],
       refresh: null,
     };
   },

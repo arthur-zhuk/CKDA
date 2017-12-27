@@ -52,7 +52,8 @@ export default {
       right: null,
       items: [
         { title: 'Attributes', icon: 'dashboard', route: 'attributes' },
-        { title: 'Data Crunching', icon: 'dashboard', route: 'datacrunch' },
+        { title: 'Data Crunching', icon: 'pie_chart', route: 'datacrunch' },
+        { title: 'My Kitties', icon: 'insert_emoticon', route: 'mykitties' },
         { title: 'About', icon: 'question_answer', route: 'about' },
       ],
     };

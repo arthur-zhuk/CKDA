@@ -4,6 +4,7 @@ import VueAnalytics from 'vue-analytics';
 import Router from 'vue-router';
 import Attributes from '@/components/Attributes';
 import DataCrunch from '@/components/DataCrunch';
+import MyKitties from '@/components/MyKitties';
 import About from '@/components/About';
 
 Vue.use(Router);
@@ -18,6 +19,11 @@ export default new Router({
       path: '/',
       name: 'Attributes',
       component: Attributes,
+    },
+    {
+      path: '/mykitties',
+      name: 'MyKitties',
+      component: MyKitties,
     },
     {
       path: '/attributes',
