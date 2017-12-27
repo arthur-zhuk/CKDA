@@ -9,6 +9,13 @@
               <div>
                 <div :style="{ color: kitty.color }" class="headline">{{ kitty.name || kitty.id }}</div>
                 <div>Gen: {{ kitty.generation }}</div>
+                <div class="" v-if="kitty && kitty.auction && kitty.auction.status === 'open'"><h3>Current Auction:</h3>
+                  <div>Auction Id: {{ kitty.auction.id }}</div>
+                  <div>Start Price ETH: {{ kitty.auction.start_price | eth }}</div>
+                  <div>End Price ETH: {{ kitty.auction.end_price | eth }}</div>
+                  <div>Current Price ETH: {{ kitty.auction.end_price | eth }}</div>
+                  <div>Seller Address: {{ kitty.auction.seller.address }}</div>
+                </div>
               </div>
             </v-flex>
             <v-flex xs5>
@@ -23,7 +30,7 @@
                 <div 
                   style="color: white"
                   :key="i" v-for="(item, i) in att.cattributes">
-                  Type: {{ item.type }} Description: <span >{{ item.description }}</span>
+                  Type: {{ item.type }} Description: <span>{{ item.description }}</span>
                 </div>
               </span>
             </v-flex>
@@ -36,17 +43,27 @@
 
 <script>
 import axios from 'axios';
+// import _ from 'lodash';
 
 export default {
   name: 'MyKitties',
+  filters: {
+    eth(val) {
+      console.log('val', val);
+      if (!val) return '';
+      return val * 0.000000000000000001;
+    },
+  },
   computed: {
     // rareComputedColor(description) {
     //   console.log('desc', description);
     //   return { rare: 'light-green lighten-1' ? this.cattributes[description] < 5000 : '' }
     // },
-    // computedColor() {
-      
-    // },
+    computedColor() {
+      // light-green lighten-1': props.item.total < 5000,
+      // 'yellow darken-1': props.item.total >= 5000 && props.item.total <= 13000,
+      // 'red darken-1': props.item.total > 13000,
+    },
   },
   data() {
     return {
@@ -82,16 +99,21 @@ export default {
           });
       });
       this.myKittiesMap.set('attributeData', arr);
-      console.log('map', this.myKittiesMap);
       this.myKitties = this.myKittiesMap.get('myKitties');
       this.myKittyAttr = this.myKittiesMap.get('attributeData');
-      console.log('arr', this.myKitties);
-      console.log('attr', this.myKittyAttr);
+      console.log('myKitties.kitties', this.myKitties.kitties);
     })
     .then(() => {
       axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
         this.cattributes = data.data;
-        console.log('Cattributes', this.cattributes);
+      //   this.myKittyAttr.forEach((cat) => {
+      //     console.log('cat', cat);
+      //     const result = _.merge(cat.cattributes, _.map(this.cattributes, obj => (
+      //       _.pick(obj, 'description', 'total')
+      //     )));
+      //     console.log('result', result);
+      //   });
+      //   console.log('result arr', this.myKittyAttr);
       });
     });
   },
