@@ -1,13 +1,13 @@
 <template>
   <!-- TODO: Link this api call with the kitten one w\ the attributes -->
   <v-container>
-    <v-flex v-if="myKitties.length > 0" xs12>
-      <v-card :key="kitty.id" v-for="kitty in myKitties.data.kitties" color="cyan darken-2" class="white--text">
+    <v-flex v-if="myKitties && myKitties.kitties && myKitties.kitties.length > 0" xs12>
+      <v-card :key="kitty.id" v-for="kitty in myKitties.kitties" color="cyan darken-2" class="white--text">
         <v-container fluid grid-list-lg>
           <v-layout row>
             <v-flex xs7>
               <div>
-                <div :style="{ color: kitty.color }" class="headline">{{ kitty.name }}</div>
+                <div :style="{ color: kitty.color }" class="headline">{{ kitty.name || kitty.id }}</div>
                 <div>Gen: {{ kitty.generation }}</div>
               </div>
             </v-flex>
@@ -17,7 +17,16 @@
                 height="125px"
                 contain
               ></v-card-media>
-              <div></div>
+            </v-flex>
+            <v-flex xs8>
+              <span v-if="att.id === kitty.id" style="color: white" :key="att.id" v-for="att in myKittyAttr">
+                <div 
+                  style="color: white"
+                  :key="i" v-for="(item, i) in att.cattributes">
+                  <div>Type: {{ item.type }}</div>
+                  <span>Description: <span>{{ item.description }}</span></span>
+                </div>
+              </span>
             </v-flex>
           </v-layout>
         </v-container>
@@ -31,13 +40,21 @@ import axios from 'axios';
 
 export default {
   name: 'MyKitties',
+  computed: {
+    // rareComputedColor(description) {
+    //   console.log('desc', description);
+    //   return { rare: 'light-green lighten-1' ? this.cattributes[description] < 5000 : '' }
+    // },
+    // computedColor() {
+      
+    // },
+  },
   data() {
     return {
       myKitties: [],
       myKittyAttr: [],
-
-      myKittiesMap: {},
-
+      myKittiesMap: new Map(),
+      cattributes: [],
       // headers: [
       //   {
       //     text: 'My Kitties',
@@ -57,20 +74,25 @@ export default {
 
     axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${ETH_PUBLIC_TOKEN}&limit=${LIMIT}&offset=${OFFSET}`)
     .then((data) => {
-      console.log('myKitties', data);
-      this.myKitties = data.data;
-      const kittyMapCreator = (kittyId) => {
-        axios.get(`https://api.cryptokitties.co/kitties/${kittyId}`)
-          .then((ids) => {
-            console.log('kittyId data map fn', ids);
-          });
-      };
-      this.myKittiesMap.set(kittyMapCreator, createMap);
+      this.myKittiesMap.set('myKitties', data.data);
+      const arr = [];
       data.data.kitties.forEach((kitty) => {
         axios.get(`https://api.cryptokitties.co/kitties/${kitty.id}`)
-        .then((ids) => {
-          console.log('kittyId data', ids);
-        });
+          .then((attributeData) => {
+            arr.push(attributeData.data);
+          });
+      });
+      this.myKittiesMap.set('attributeData', arr);
+      console.log('map', this.myKittiesMap);
+      this.myKitties = this.myKittiesMap.get('myKitties');
+      this.myKittyAttr = this.myKittiesMap.get('attributeData');
+      console.log('arr', this.myKitties);
+      console.log('attr', this.myKittyAttr);
+    })
+    .then(() => {
+      axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
+        this.cattributes = data.data;
+        console.log('Cattributes', this.cattributes);
       });
     });
   },

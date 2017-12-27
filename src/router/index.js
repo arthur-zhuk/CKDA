@@ -17,7 +17,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Attributes',
+      name: 'Root',
       component: Attributes,
     },
     {
