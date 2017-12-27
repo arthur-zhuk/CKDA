@@ -23,8 +23,7 @@
                 <div 
                   style="color: white"
                   :key="i" v-for="(item, i) in att.cattributes">
-                  <div>Type: {{ item.type }}</div>
-                  <span>Description: <span>{{ item.description }}</span></span>
+                  Type: {{ item.type }} Description: <span >{{ item.description }}</span>
                 </div>
               </span>
             </v-flex>
