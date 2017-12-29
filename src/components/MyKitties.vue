@@ -35,7 +35,7 @@
                 <v-container>
                   <v-layout v-if="kitty && kitty.cattributes.length > 0" row wrap>
                     <v-flex>
-                      <div :key="j" v-for="(cattribute, j) in kitty.cattributes">
+                      <div class="cap" :key="j" v-for="(cattribute, j) in kitty.cattributes">
                         {{ cattribute.type }}: {{ cattribute.description }}
                       </div>
                     </v-flex>
