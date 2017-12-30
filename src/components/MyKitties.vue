@@ -13,7 +13,7 @@
     </v-layout>
     <v-container fluid grid-list-xl>
       <v-layout row wrap>
-        <v-flex v-if="gArr && gArr.length > 0" :key="y" v-for="(kitty, y) in gArr" xs12 sm6 md4 offset-xs2 offset-sm0 offset-md0 offset-lg0>
+        <v-flex v-if="allYourKitties && allYourKitties.length > 0" :key="y" v-for="(kitty, y) in allYourKitties" xs12 sm6 md4 offset-xs2 offset-sm0 offset-md0 offset-lg0>
           <v-card>
             <v-card-media
               :src="kitty.image_url"
@@ -30,10 +30,19 @@
                 </v-layout>
               </v-container>
               <v-container>
-                <v-layout v-if="kitty && kitty.cattributes.length > 0" row wrap>
+                <v-layout v-show="kitty && kitty.cattributes" row wrap>
                   <v-flex>
                     <div class="cap" :key="j" v-for="(cattribute, j) in kitty.cattributes">
-                      {{ cattribute.type }}: <span >{{ cattribute.description }}</span>
+                      {{ cattribute.type }}:
+                      <span v-if="cattribute && (Number(cattribute.total) > 5000 && Number(cattribute.total) <= 50000)" style="color:#FFBF00;">
+                        {{ cattribute.description }}
+                      </span> 
+                      <span v-else-if="cattribute && Number(cattribute.total) <= 5000" style="color:green;">
+                        {{ cattribute.description }}
+                      </span> 
+                      <span v-else style="color:red;">
+                        {{ cattribute.description }}
+                      </span> 
                     </div>
                   </v-flex>
                   <v-flex>
@@ -65,6 +74,7 @@
             </v-slide-y-transition>
             </v-card>
           </v-flex>
+          <v-flex v-else>Hi</v-flex>
         </v-layout>
     </v-container>
   </v-container>
@@ -83,85 +93,43 @@ export default {
   },
   watch: {
     ETH_ADDRESS(val) {
-      this.gArr = [];
-      // const ETH_PUBLIC_TOKEN = '0x6265aafc8d25b36f97181c44d0eb6693f00eba17';
       const LIMIT = 1000;
+      const finalKArr = [];
       // const OFFSET = 20;
-      axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=0`)
-        .then((data) => {
-          this.gKArr.push(data.data);
-          this.myKittiesMap.set('myKitties', this.gKArr);
-          // const arr = [];
-          data.data.kitties.forEach((kitty) => {
-            axios.get(`https://api.cryptokitties.co/kitties/${kitty.id}`)
-              .then((attributeData) => {
-                this.gArr.push(attributeData.data);
-              });
-          });
-          this.myKittiesMap.set('attributeData', this.gArr);
-          // this.myKitties = this.myKittiesMap.get('myKitties');
-          this.myKittyAttr = this.myKittiesMap.get('attributeData');
-        })
-        .then(() => {
-          axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=20`)
-            .then((data) => {
-              this.gKArr.push(data.data);
-              this.myKittiesMap.set('myKitties', this.gKArr);
-              // const arr = [];
-              data.data.kitties.forEach((kitty) => {
-                axios.get(`https://api.cryptokitties.co/kitties/${kitty.id}`)
-                  .then((attributeData) => {
-                    this.gArr.push(attributeData.data);
-                  });
-              });
-              this.myKittiesMap.set('attributeData', this.gArr);
-              // this.myKitties = this.myKittiesMap.get('myKitties');
-              this.myKittyAttr = this.myKittiesMap.get('attributeData');
-            });
-        })
-        .then(() => {
-          axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=40`)
-            .then((data) => {
-              this.gKArr.push(data.data);
-              this.myKittiesMap.set('myKitties', this.gKArr);
-              // const arr = [];
-              data.data.kitties.forEach((kitty) => {
-                axios.get(`https://api.cryptokitties.co/kitties/${kitty.id}`)
-                  .then((attributeData) => {
-                    this.gArr.push(attributeData.data);
-                  });
-              });
-              this.myKittiesMap.set('attributeData', this.gArr);
-              this.myKitties = this.myKittiesMap.get('myKitties');
-              this.myKittyAttr = this.myKittiesMap.get('attributeData');
-              console.log('garr', this.gArr, this.gKArr);
-            });
-        })
-        .then(() => {
-          axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
-            this.cattributes = data.data;
-          //   this.myKittyAttr.forEach((cat) => {
-          //     console.log('cat', cat);
-          //     const result = _.merge(cat.cattributes, _.map(this.cattributes, obj => (
-          //       _.pick(obj, 'description', 'total')
-          //     )));
-          //     console.log('result', result);
-          //   });
-          //   console.log('result arr', this.myKittyAttr);
-          });
-        });
-    },
-  },
-  computed: {
-    computedRareColor() {
-      this.cattributes.forEach((item) => {
-        console.log('cattribute item', item, Number(item.total));
-        if (Number(item.total) > 3000) {
-          return 'yellow';
-        }
-        return 'red';
+      axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
+        this.cattributes = data.data;
       });
-      // return 'green';
+      axios.all([
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=0`),
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=20`),
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=40`),
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=60`),
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=80`),
+      ])
+      .then(axios.spread((...args) => {
+        args.forEach((chunk) => {
+          finalKArr.push(...chunk.data.kitties);
+        });
+        return finalKArr;
+      }))
+      .then((allYourKitties) => {
+        allYourKitties.forEach((kitty) => {
+          const cattributes = this.cattributes;
+          axios.get(`https://api.cryptokitties.co/kitties/${kitty.id}`)
+            .then((attributeData) => {
+              Object.assign(kitty, attributeData.data);
+              kitty.cattributes.forEach((cattribute) => {
+                const filtered = cattributes.filter(match => (
+                  match.description === cattribute.description));
+                Object.assign(cattribute, { total: filtered[0].total });
+              });
+            })
+            .catch((err) => {
+              console.error('err', err);
+            });
+          this.allYourKitties = allYourKitties;
+        });
+      });
     },
   },
   data() {
@@ -174,6 +142,8 @@ export default {
       myKittyAttr: [],
       myKittiesMap: new Map(),
       cattributes: [],
+      allYourKitties: null,
+      arr: [],
     };
   },
   methods: {
@@ -182,112 +152,40 @@ export default {
     const ETH_PUBLIC_TOKEN = '0x6265aafc8d25b36f97181c44d0eb6693f00eba17';
     const LIMIT = 1000;
     const finalKArr = [];
-    // const OFFSET = 20;
+    axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
+      this.cattributes = data.data;
+    });
     axios.all([
       axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${ETH_PUBLIC_TOKEN}&limit=${LIMIT}&offset=0`),
       axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${ETH_PUBLIC_TOKEN}&limit=${LIMIT}&offset=20`),
       axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${ETH_PUBLIC_TOKEN}&limit=${LIMIT}&offset=40`),
+      axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${ETH_PUBLIC_TOKEN}&limit=${LIMIT}&offset=60`),
+      axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${ETH_PUBLIC_TOKEN}&limit=${LIMIT}&offset=80`),
     ])
-    // .then((data) => {
-    //   console.log('axios all data', data.data);
-    // });
     .then(axios.spread((...args) => {
-      console.log('data', args);
-      console.log('finalKArr 0', finalKArr);
       args.forEach((chunk) => {
-        console.log('chunk', chunk.data.kitties);
         finalKArr.push(...chunk.data.kitties);
       });
-      console.log('finalKArr 1', finalKArr);
       return finalKArr;
     }))
     .then((allYourKitties) => {
-      console.log('allYourKitties', allYourKitties);
+      allYourKitties.forEach((kitty) => {
+        const cattributes = this.cattributes;
+        axios.get(`https://api.cryptokitties.co/kitties/${kitty.id}`)
+          .then((attributeData) => {
+            Object.assign(kitty, attributeData.data);
+            kitty.cattributes.forEach((cattribute) => {
+              const filtered = cattributes.filter(match => (
+                match.description === cattribute.description));
+              Object.assign(cattribute, { total: filtered[0].total });
+            });
+          })
+          .catch((err) => {
+            console.error('err', err);
+          });
+      });
       this.allYourKitties = allYourKitties;
     });
-    /*
-    for (let i = 0; i < 200; i += 20) {
-      axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${ETH_PUBLIC_TOKEN}&limit=${LIMIT}&offset=${i}`, { headers: { 'X-Ratelimit-Limit': 1000 } })
-        .then((data) => {
-          this.gKArr.push(data.data);
-          this.myKittiesMap.set('myKitties', this.gKArr);
-          // const arr = [];
-          data.data.kitties.forEach((kitty) => {
-            axios.get(`https://api.cryptokitties.co/kitties/${kitty.id}`)
-              .then((attributeData) => {
-                this.gArr.push(attributeData.data);
-              });
-          });
-          this.myKittiesMap.set('attributeData', this.gArr);
-          this.myKitties = this.myKittiesMap.get('myKitties');
-          this.myKittyAttr = this.myKittiesMap.get('attributeData');
-          console.log('garr', this.gArr, this.gKArr);
-          console.log('myKitties & myKittyAttr', this.myKitties, this.myKittyAttr);
-        });
-    }
-    axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
-      this.cattributes = data.data;
-      console.log('this.cattributes', this.cattributes);
-    //   this.myKittyAttr.forEach((cat) => {
-    //     console.log('cat', cat);
-    //     const result = _.merge(cat.cattributes, _.map(this.cattributes, obj => (
-    //       _.pick(obj, 'description', 'total')
-    //     )));
-    //     console.log('result', result);
-    //   });
-    //   console.log('result arr', this.myKittyAttr);
-    });
-    // this.myKittiesMap.set('attributeData', this.gArr);
-    console.log('myKittyAttr', this.myKittyAttr);
-      // .then(() => {
-      //   axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${ETH_PUBLIC_TOKEN}&limit=${LIMIT}&offset=20`)
-      //     .then((data) => {
-      //       this.gKArr.push(data.data);
-      //       this.myKittiesMap.set('myKitties', this.gKArr);
-      //       // const arr = [];
-      //       data.data.kitties.forEach((kitty) => {
-      //         axios.get(`https://api.cryptokitties.co/kitties/${kitty.id}`)
-      //           .then((attributeData) => {
-      //             this.gArr.push(attributeData.data);
-      //           });
-      //       });
-      //       this.myKittiesMap.set('attributeData', this.gArr);
-      //       // this.myKitties = this.myKittiesMap.get('myKitties');
-      //       this.myKittyAttr = this.myKittiesMap.get('attributeData');
-      //     });
-      // })
-      // .then(() => {
-      //   axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${ETH_PUBLIC_TOKEN}&limit=${LIMIT}&offset=40`)
-      //     .then((data) => {
-      //       this.gKArr.push(data.data);
-      //       this.myKittiesMap.set('myKitties', this.gKArr);
-      //       // const arr = [];
-      //       data.data.kitties.forEach((kitty) => {
-      //         axios.get(`https://api.cryptokitties.co/kitties/${kitty.id}`)
-      //           .then((attributeData) => {
-      //             this.gArr.push(attributeData.data);
-      //           });
-      //       });
-      //       this.myKittiesMap.set('attributeData', this.gArr);
-      //       this.myKitties = this.myKittiesMap.get('myKitties');
-      //       this.myKittyAttr = this.myKittiesMap.get('attributeData');
-      //       console.log('garr', this.gArr, this.gKArr);
-      //     });
-      // })
-      // .then(() => {
-      //   axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
-      //     this.cattributes = data.data;
-        //   this.myKittyAttr.forEach((cat) => {
-        //     console.log('cat', cat);
-        //     const result = _.merge(cat.cattributes, _.map(this.cattributes, obj => (
-        //       _.pick(obj, 'description', 'total')
-        //     )));
-        //     console.log('result', result);
-        //   });
-        //   console.log('result arr', this.myKittyAttr);
-      //   });
-      // });
-      */
   },
 };
 </script>

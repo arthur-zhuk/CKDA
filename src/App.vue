@@ -22,6 +22,7 @@
       </v-toolbar>
       <v-divider></v-divider>
        <v-list dense class="pt-0">
+        <!-- <v-list-tile :to="{path: '/' + item.route}" v-for="item in items" :key="item.title" @click=""> -->
         <v-list-tile :to="{path: '/' + item.route}" v-for="item in items" :key="item.title" @click="">
           <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
