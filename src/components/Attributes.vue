@@ -17,38 +17,43 @@
         <v-flex xs6>Darker Color = Rarer | Rarity Calculated Off Total # of Attributes</v-flex>
       </v-layout>
     </v-container>
-    <v-data-table
-      :headers="headers"
-      :items="cattributes"
-      :search="search"
-      type="number"
-      step="20"
-      hide-actions
-      class="elevation-1"
-    >
-      <template slot="items" slot-scope="props">
-        <td class="cap">{{ props.item.description }}</td>
-        <td class="text-xs-right cap">{{ props.item.type }}</td>
-        <td 
-          v-if="props.item.total < 5000"
-          :style="{ backgroundColor: computedColor(props.item.total, 'rare') }"
-          class="text-xs-right cap">
-          {{ props.item.total }}
-        </td>
-        <td 
-          v-else-if="props.item.total >= 5000 && props.item.total <= 13000"
-          :style="{ backgroundColor: computedColor(props.item.total, 'uncommon') }"
-          class="text-xs-right cap">
-          {{ props.item.total }}
-        </td>
-        <td 
-          v-else
-          :style="{ backgroundColor: computedColor(props.item.total, 'common') }"
-          class="text-xs-right cap">
-          {{ props.item.total }}
-        </td>
-      </template>
-    </v-data-table>
+    <v-container v-if="cattributes.length <= 0">
+      <v-progress-linear :indeterminate="true"></v-progress-linear>
+    </v-container>
+    <v-container v-else>
+      <v-data-table
+        :headers="headers"
+        :items="cattributes"
+        :search="search"
+        type="number"
+        step="20"
+        hide-actions
+        class="elevation-1"
+      >
+        <template slot="items" slot-scope="props">
+          <td class="cap">{{ props.item.description }}</td>
+          <td class="text-xs-right cap">{{ props.item.type }}</td>
+          <td 
+            v-if="props.item.total < 5000"
+            :style="{ backgroundColor: computedColor(props.item.total, 'rare') }"
+            class="text-xs-right cap">
+            {{ props.item.total }}
+          </td>
+          <td 
+            v-else-if="props.item.total >= 5000 && props.item.total <= 13000"
+            :style="{ backgroundColor: computedColor(props.item.total, 'uncommon') }"
+            class="text-xs-right cap">
+            {{ props.item.total }}
+          </td>
+          <td 
+            v-else
+            :style="{ backgroundColor: computedColor(props.item.total, 'common') }"
+            class="text-xs-right cap">
+            {{ props.item.total }}
+          </td>
+        </template>
+      </v-data-table>
+    </v-container>
     <div class="chart-section">
     </div>
   </v-container>
