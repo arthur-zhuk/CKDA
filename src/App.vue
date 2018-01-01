@@ -44,10 +44,13 @@
 </template>
 
 <script>
+import Web3 from 'web3';
+
 export default {
   name: 'app',
   data() {
     return {
+      web3: null,
       drawer: true,
       mini: true,
       right: null,
@@ -58,6 +61,15 @@ export default {
         { title: 'About', icon: 'question_answer', route: 'about' },
       ],
     };
+  },
+  created() {
+    if (typeof window.web3 !== 'undefined') {
+      window.web3 = new Web3(window.web3.currentProvider);
+    } else {
+      window.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+    }
+    window.ETH_ADDRESS = window.web3.eth.Contract.currentProvider.publicConfigStore._state.selectedAddress; // eslint-disable-line
+    console.log('web3', window.ETH_ADDRESS);
   },
 };
 </script>

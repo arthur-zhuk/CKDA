@@ -7,7 +7,7 @@
           label="Enter Your Ethereum Wallet Address to see your CryptoKitties"
           id="eth-address"
           single-line
-          v-model="ETH_ADDRESS"
+          @keydown.enter.native="searchKitty"
         ></v-text-field>
       </v-flex>
     </v-layout>
@@ -32,21 +32,28 @@
               <v-container>
                 <v-layout v-show="kitty && kitty.cattributes" row wrap>
                   <v-flex>
-                    <div class="cap" :key="j" v-for="(cattribute, j) in kitty.cattributes">
+                    <div slot="activator" class="cap" :key="j" v-for="(cattribute, j) in kitty.cattributes">
                       {{ cattribute.type }}:
-                      <span v-if="cattribute && (Number(cattribute.total) > 5000 && Number(cattribute.total) <= 50000)" style="color:#FFBF00;">
+                      <span v-if="cattribute && cattribute.total && (Number(cattribute.total) > 5000 && Number(cattribute.total) <= 50000)" style="color:#111111">
                         {{ cattribute.description }}
                       </span> 
-                      <span v-else-if="cattribute && Number(cattribute.total) <= 5000" style="color:green;">
+                      <span v-else-if="cattribute && cattribute.total && (Number(cattribute.total) > 50000 && Number(cattribute.total) <= 100000)" style="color:#FFDC00">
                         {{ cattribute.description }}
                       </span> 
-                      <span v-else style="color:red;">
+                      <span v-else-if="cattribute && cattribute.total && (Number(cattribute.total) > 50000 && Number(cattribute.total) <= 100000)" style="color:#FFDC00">
+                        {{ cattribute.description }}
+                      </span> 
+                      <span v-else-if="cattribute && cattribute.total && Number(cattribute.total) <= 5000" style="color:#2ECC40;">
+                        {{ cattribute.description }}
+                      </span> 
+                      <span v-else style="color:#B71C1C;">
                         {{ cattribute.description }}
                       </span> 
                     </div>
                   </v-flex>
                   <v-flex>
                     <div v-if="kitty && kitty.auction && kitty.auction.status === 'open'"><h3>Current Auction:</h3>
+                      <!-- <div>Time Duration: {{ kitty.auction.duration }}</div> -->
                       <div>Auction Id: {{ kitty.auction.id }}</div>
                       <div>Start Price ETH: {{ kitty.auction.start_price | eth }}</div>
                       <div>End Price ETH: {{ kitty.auction.end_price | eth }}</div>
@@ -82,6 +89,7 @@
 
 <script>
 import axios from 'axios';
+import moment from 'moment';
 
 export default {
   name: 'MyKitties',
@@ -91,20 +99,41 @@ export default {
       return val * 0.000000000000000001;
     },
   },
-  watch: {
-    ETH_ADDRESS(val) {
+  data() {
+    return {
+      gArr: [],
+      gKArr: [],
+      show: false,
+      ETH_ADDRESS: '',
+      myKitties: [],
+      myKittyAttr: [],
+      myKittiesMap: new Map(),
+      cattributes: [],
+      allYourKitties: null,
+      arr: [],
+    };
+  },
+  methods: {
+    // convertTime(st, et) {
+      // const startTime = moment.unix(st);
+      // const endTime = moment.unix(et);
+      // const timeLeft = moment(et - st, 'hh:mm');
+      // console.log('stl', timeLeft);
+      // console.log('stl', startTime, endTime, timeLeft);
+      // return timeLeft;
+    // },
+    searchKitty(val) {
       const LIMIT = 1000;
       const finalKArr = [];
-      // const OFFSET = 20;
       axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
         this.cattributes = data.data;
       });
       axios.all([
-        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=0`),
-        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=20`),
-        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=40`),
-        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=60`),
-        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val}&limit=${LIMIT}&offset=80`),
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val.target.value}&limit=${LIMIT}&offset=0`),
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val.target.value}&limit=${LIMIT}&offset=20`),
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val.target.value}&limit=${LIMIT}&offset=40`),
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val.target.value}&limit=${LIMIT}&offset=60`),
+        axios.get(`https://api.cryptokitties.co/kitties?owner_wallet_address=${val.target.value}&limit=${LIMIT}&offset=80`),
       ])
       .then(axios.spread((...args) => {
         args.forEach((chunk) => {
@@ -132,24 +161,8 @@ export default {
       });
     },
   },
-  data() {
-    return {
-      gArr: [],
-      gKArr: [],
-      show: false,
-      ETH_ADDRESS: '',
-      myKitties: [],
-      myKittyAttr: [],
-      myKittiesMap: new Map(),
-      cattributes: [],
-      allYourKitties: null,
-      arr: [],
-    };
-  },
-  methods: {
-  },
   mounted() {
-    const ETH_PUBLIC_TOKEN = '0x6265aafc8d25b36f97181c44d0eb6693f00eba17';
+    const ETH_PUBLIC_TOKEN = window.ETH_ADDRESS; // eslint-disable-line
     const LIMIT = 1000;
     const finalKArr = [];
     axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
@@ -185,6 +198,7 @@ export default {
           });
       });
       this.allYourKitties = allYourKitties;
+      console.log('ayk', allYourKitties);
     });
   },
 };

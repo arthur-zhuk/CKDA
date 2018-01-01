@@ -11,6 +11,12 @@
         v-model="search"
       ></v-text-field>
     </v-card-title>
+    <v-container>
+      <v-layout row justify-space-around>
+        <v-flex xs6>Key: <span style="color:blue">Blue = Rare</span> <span style="color:green">Green = Uncommon</span> <span style="color:red">Red = Common</span></v-flex>
+        <v-flex xs6>Darker Color = Rarer | Rarity Calculated Off Total # of Attributes</v-flex>
+      </v-layout>
+    </v-container>
     <v-data-table
       :headers="headers"
       :items="cattributes"
@@ -24,11 +30,20 @@
         <td class="cap">{{ props.item.description }}</td>
         <td class="text-xs-right cap">{{ props.item.type }}</td>
         <td 
-          :class="{ 
-            'light-green lighten-1': props.item.total < 5000,
-            'yellow darken-1': props.item.total >= 5000 && props.item.total <= 13000,
-            'red darken-1': props.item.total > 13000,
-            }"
+          v-if="props.item.total < 5000"
+          :style="{ backgroundColor: computedColor(props.item.total, 'rare') }"
+          class="text-xs-right cap">
+          {{ props.item.total }}
+        </td>
+        <td 
+          v-else-if="props.item.total >= 5000 && props.item.total <= 13000"
+          :style="{ backgroundColor: computedColor(props.item.total, 'uncommon') }"
+          class="text-xs-right cap">
+          {{ props.item.total }}
+        </td>
+        <td 
+          v-else
+          :style="{ backgroundColor: computedColor(props.item.total, 'common') }"
           class="text-xs-right cap">
           {{ props.item.total }}
         </td>
@@ -41,7 +56,6 @@
 
 <script>
 import axios from 'axios';
-// import VueCharts, { Bar, Line } from 'vue-chartjs';
 
 export default {
   name: 'Attributes',
@@ -60,30 +74,41 @@ export default {
       ],
       cattributes: [],
       refresh: null,
+      totalCats: 0,
     };
   },
+  computed: {
+  },
+  methods: {
+    computedColor(val, rarityCategory) {
+      const colorPercent = (val / this.totalCats) * 100;
+      if (rarityCategory === 'rare') {
+        return `hsl(233, 100%, ${(colorPercent * 50) + 50}%)`;
+      } else if (rarityCategory === 'uncommon') {
+        return `hsl(120, 100%, ${(colorPercent * 50) - 50}%)`;
+      } else if (rarityCategory === 'common') {
+        return `hsl(7, 100%, ${(colorPercent * 0.01 * 50) + 50}%)`;
+      }
+      return `hsl(7, 100%, ${(colorPercent * 50) - 50}%)`;
+    },
+  },
   mounted() {
-    axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
-      this.cattributes = data.data;
-    });
-    this.refresh = setInterval(() => {
+    let temp;
+    axios.get('https://api.cryptokitties.co/kitties').then((data) => {
+      this.totalCats = data.data.total;
+    })
+    .then(() => {
       axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
         this.cattributes = data.data;
+        temp = data.data;
+        temp.sort((a, b) => Number(a.total) - Number(b.total));
       });
-    }, 30000);
-
-
-    // Overwriting base render method with actual data.
-    // this.renderChart({
-    //   labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-    //   datasets: [
-    //     {
-    //       label: 'GitHub Commits',
-    //       backgroundColor: '#f87979',
-    //       data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11],
-    //     },
-    //   ],
-    // });
+      this.refresh = setInterval(() => {
+        axios.get('https://api.cryptokitties.co/cattributes?total=true').then((data) => {
+          this.cattributes = data.data;
+        });
+      }, 30000);
+    });
   },
 };
 </script>
