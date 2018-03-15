@@ -1,21 +1,5 @@
-# ckda
+CKDA is a tool that helps you visualize data to make buying and selling decisions for a hit game on the the Ethereum network, CryptoKitties.
 
-> A Vue.js project
+Tool optimized to give you the data you need to make decisions at a glance. App received over 400 users within hours of publishing with almost no advertising. Intricate mapping algorithm allows you to view all your kitties in one page unlike the official client which is paginated.
 
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+CKDA was built with Ethereum's Web3, and the VueJS Framework.
